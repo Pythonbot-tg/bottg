@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">from </span><span class="s1">aiogram </span><span class="s0">import </span><span class="s1">Bot</span><span class="s2">, </span><span class="s1">Dispatcher</span><span class="s2">, </span><span class="s1">executor</span><span class="s2">, </span><span class="s1">types</span>
+
+<span class="s1">bot </span><span class="s2">= </span><span class="s1">Bot</span><span class="s2">(</span><span class="s3">'6328853075:AAGFBCQOif6nkJBEbP49R35jSsW3Xd1uzCw'</span><span class="s2">)</span>
+<span class="s1">dp </span><span class="s2">= </span><span class="s1">Dispatcher</span><span class="s2">(</span><span class="s1">bot</span><span class="s2">=</span><span class="s1">bot</span><span class="s2">)</span>
+
+
+<span class="s2">@</span><span class="s1">dp</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">(</span><span class="s1">commands</span><span class="s2">=[</span><span class="s3">'start'</span><span class="s2">])</span>
+<span class="s0">async def </span><span class="s1">cmd_start</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">answer</span><span class="s2">(</span><span class="s3">f'</span><span class="s0">{</span><span class="s1">message</span><span class="s2">.</span><span class="s1">from_user</span><span class="s2">.</span><span class="s1">first_name</span><span class="s0">}</span><span class="s3">, Ты пидор'</span><span class="s2">)</span>
+
+
+<span class="s2">@</span><span class="s1">dp</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">(</span><span class="s1">commands</span><span class="s2">=[</span><span class="s3">'download'</span><span class="s2">])</span>
+<span class="s0">async def </span><span class="s1">start</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply</span><span class="s2">(</span><span class="s3">&quot;Привет! Отправь мне ссылку на видео из Instagram, чтобы я скачал его.&quot;</span><span class="s2">)</span>
+
+
+<span class="s2">@</span><span class="s1">dp</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">()</span>
+<span class="s0">async def </span><span class="s1">download_video</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s1">video_url </span><span class="s2">= </span><span class="s1">message</span><span class="s2">.</span><span class="s1">text</span>
+    <span class="s0">if </span><span class="s3">'instagram.com' </span><span class="s0">not in </span><span class="s1">video_url</span><span class="s2">:</span>
+        <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply</span><span class="s2">(</span><span class="s3">&quot;Пожалуйста, отправьте ссылку на видео из Instagram.&quot;</span><span class="s2">)</span>
+        <span class="s0">return</span>
+
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">response </span><span class="s2">= </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">video_url</span><span class="s2">)</span>
+        <span class="s1">response</span><span class="s2">.</span><span class="s1">raise_for_status</span><span class="s2">()</span>
+        <span class="s1">content_type </span><span class="s2">= </span><span class="s1">response</span><span class="s2">.</span><span class="s1">headers</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s3">'Content-Type'</span><span class="s2">)</span>
+        <span class="s0">if </span><span class="s3">'video' </span><span class="s0">not in </span><span class="s1">content_type</span><span class="s2">:</span>
+            <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply</span><span class="s2">(</span><span class="s3">&quot;Ссылка не ведет к видео.&quot;</span><span class="s2">)</span>
+            <span class="s0">return</span>
+
+        <span class="s1">video_data </span><span class="s2">= </span><span class="s1">response</span><span class="s2">.</span><span class="s1">content</span>
+        <span class="s1">video_filename </span><span class="s2">= </span><span class="s3">'video.mp4'</span>
+        <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s1">video_filename</span><span class="s2">, </span><span class="s3">'wb'</span><span class="s2">) </span><span class="s0">as </span><span class="s1">video_file</span><span class="s2">:</span>
+            <span class="s1">video_file</span><span class="s2">.</span><span class="s1">write</span><span class="s2">(</span><span class="s1">video_data</span><span class="s2">)</span>
+
+        <span class="s0">with </span><span class="s1">open</span><span class="s2">(</span><span class="s1">video_filename</span><span class="s2">, </span><span class="s3">'rb'</span><span class="s2">) </span><span class="s0">as </span><span class="s1">video_file</span><span class="s2">:</span>
+            <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply_video</span><span class="s2">(</span><span class="s1">video_file</span><span class="s2">)</span>
+
+        <span class="s1">os</span><span class="s2">.</span><span class="s1">remove</span><span class="s2">(</span><span class="s1">video_filename</span><span class="s2">)</span>
+
+    <span class="s0">except </span><span class="s1">requests</span><span class="s2">.</span><span class="s1">exceptions</span><span class="s2">.</span><span class="s1">HTTPError</span><span class="s2">:</span>
+        <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply</span><span class="s2">(</span><span class="s3">&quot;Не удалось загрузить видео. Пожалуйста, проверьте ссылку и попробуйте снова.&quot;</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">dp</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">()</span>
+<span class="s0">async def </span><span class="s1">answer</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s0">await </span><span class="s1">message</span><span class="s2">.</span><span class="s1">reply</span><span class="s2">(</span><span class="s3">'Я тебя не понимаю.'</span><span class="s2">)</span>
+
+
+<span class="s0">if </span><span class="s1">__name__ </span><span class="s2">!= </span><span class="s3">'__main__'</span><span class="s2">:</span>
+    <span class="s0">pass</span>
+<span class="s0">else</span><span class="s2">:</span>
+    <span class="s1">executor</span><span class="s2">.</span><span class="s1">start_polling</span><span class="s2">(</span><span class="s1">dp</span><span class="s2">)</span></pre>
+</body>
+</html>
